@@ -9,7 +9,7 @@ T=M*N/2;
 Nr=M*N;
 Nt=16;
 Ns=16;
-angle_sigma=10/180*pi;
+angle_sigma=5/180*pi;
 %%%%  it is difficult to express the range of theta phi if the array is located in yz plane
 %%% hence, assume that the array is located in xy plane(it is different with paper).
 %%% phi is the azimuth angle, which is the angle between the x-axis and the projection of the arrival direction vector onto the xy plane. It is positive when measured from the x-axis toward the y-axis.
@@ -18,11 +18,15 @@ angle_sigma=10/180*pi;
 %%%% theta=0 deg is corrsponding to x-axis; theta=90 deg is corrsponding to z-axis; 
 %%%% given the celluar situation(120deg coverage), theta=[60,90] and phi=[0, 360]
 %%%% actually, in practical, the antenna pattern can not cover 180deg due to the isotropic radiator can not exist.
-AoD_m_thetamin=-pi/3+pi/2;
+AoD_m_thetamin=-pi/2+pi/2;
 AoD_mthetamax=pi/2;
-AoA_m_thetamin=-pi/3+pi/2;
+AoA_m_thetamin=-pi/2+pi/2;
 AoA_mthetamax=pi/2;
-[H,H2,~,~]=channel_realization_regular(Ns,Nt,Nr,realization,angle_sigma,AoD_m_thetamin,AoD_mthetamax,AoA_m_thetamin,AoA_mthetamax);
+load pattern.mat
+load C_pararmater_64.mat
+load C_pararmater_32.mat
+load C_pararmater_16.mat
+[H,H2,~,~]=channel_realization_regular(Ns,Nt,Nr,realization,angle_sigma,AoD_m_thetamin,AoD_mthetamax,AoA_m_thetamin,AoA_mthetamax,patternrE,Zr,Zt_64,Zt_32);
 
 SNR_dB = -30:5:10;
 SNR = 10.^(SNR_dB./10);
@@ -32,7 +36,8 @@ Ro_best=zeros(1,smax);
 Ro2x=zeros(1,smax);
 Ro_GorokohovSelected=zeros(1,smax);
 %% solution is the solved irregular array configuation
-solution=[1,0,0,1,0,0,0,1,0,0,0,1,0,0,1,0,0,0,1,0,0,1,0,1,0,0,1,0,0,0,1,0,0,1,0,0,0,0,0,0,1,0,0,1,0,0,0,0,1,0,0,0,1,0,0,0,0,0,1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,0,0,0,1,0,0,0,0,0,1,0,1,0,0,1,0,0,0,1,0,0,1,0,1,0,1,0,1,0,1,0,0,0];
+
+solution=[0,1,0,0,0,1,0,0,1,0,1,0,0,1,0,1,0,0,1,0,0,1,0,0,0,0,0,1,0,1,0,0,0,1,0,0,0,0,1,0,1,0,0,0,0,1,0,1,0,1,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,1,0,0,0,1,0,0,0,1,0,0,0,1,0,1,0,1,0,1,0,0,1,0,0,1,0,0,1,0,0,0,0,1,0,0,1];
 sol_index=find(solution>0.5);
 countset=collect_2s(M,N);
 combiningset=collect_combining(countset,M,N);

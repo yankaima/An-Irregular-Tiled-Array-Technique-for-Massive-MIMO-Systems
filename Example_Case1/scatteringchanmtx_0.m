@@ -1,4 +1,4 @@
-function H = scatteringchanmtx_0(txarraypos_in,rxarraypos_in,txang_in,rxang_in,g_in)
+function H = scatteringchanmtx_0(txarraypos_in,rxarraypos_in,txang_in,rxang_in,g_in,patternrE)
 %SCATTERINGCHANMTX    Scattering based MIMO channel matrix
 %   HCHAN = scatteringchanmtx(TXARRAYPOS,RXARRAYPOS,NS) returns the channel
 %   matrix, HCHAN, for a MIMO channel consists of a transmit array
@@ -147,7 +147,7 @@ function H = scatteringchanmtx_0(txarraypos_in,rxarraypos_in,txang_in,rxang_in,g
 %#codegen
 %#ok<*EMCA>
     
-narginchk(3,5);
+narginchk(3,6);
 
 if size(txarraypos_in,1) == 1
     txarraypos = [zeros(1,size(txarraypos_in,2));txarraypos_in;zeros(1,size(txarraypos_in,2))];
@@ -242,8 +242,21 @@ else
         'scatteringchanmtx','G');
 end
 at=steervec(txarraypos,txang);
+txangle=round(txang);
+
+for i=1:length(txangle)
+    ind=find(patternrE(:,1)-txangle(1,i)==0 & patternrE(:,2)-txangle(2,i)==0);
+    at(:,i)=at(:,i)*patternrE(ind,3);
+end
+ar=steervec(rxarraypos,rxang);
+rxangle=round(rxang);
+
+for i=1:length(rxangle)
+    ind=find(patternrE(:,1)-rxangle(1,i)==0 & patternrE(:,2)-rxangle(2,i)==0);
+    ar(:,i)=ar(:,i)*patternrE(ind,3);
+end
 Htemp = bsxfun(@times,g,...
-   steervec(rxarraypos,rxang))*at.';
+   ar)*at.';
 
 H = Htemp;  % Nt x Nr
     
